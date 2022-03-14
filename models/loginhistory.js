@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
 const loginHistorySchema = new mongoose.Schema({
-	username: {
+	user: {
 		type:String,
 		required: true,
 
 	},
-	ipaddress: {
+	ip: {
 		type: String,
 	}
 });

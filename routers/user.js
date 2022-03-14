@@ -1,3 +1,9 @@
+//this model is apis related to user login and signup
+
+
+
+
+
 const express = require('express');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
@@ -7,7 +13,7 @@ const router = new express.Router();
 
 
 
-
+//sign up api to register a new user
 router.post('/user/signup', async (req, res)=>{
 	try{
 		var user = new User({
@@ -17,15 +23,17 @@ router.post('/user/signup', async (req, res)=>{
 		var toekn = jwt.sign({_id: user._id.toString}, process.env.TOKEN_SECRET);
 
 		user = await user.save();
-		user = user.toObject();
-		console.log(user);
-		console.log(user);
-		res.send(user);
+		var authtoken = {
+			authenticationToken: token
+		};
+		res.send(authtoken);
 	}catch(e){
 		res.send(e);
 	}
 });
 
+
+//login api this api will provide the authentication token for the registered user if user is providing incorrect details it will return invalid credentials
 router.post('/user/login', async(req, res)=>{
 	try{
 		var usr = await User.findOne({username: req.body.username});
@@ -40,21 +48,17 @@ router.post('/user/login', async(req, res)=>{
 					authenticationToken: token
 				};
 
-				var logdata = {
-					"user": req.body.username,
-					"ip": req.socket.remoteAddress
-				}
-				console.log(logdata);
+				
 
 				var history = new LoginHistory({
-					"username": req.body.username,
-					"ipaddress": req.socket.remoteAddress
+					"user": req.body.username,
+					"ip": req.socket.remoteAddress
 				});
+				// var url="https://encrusxqoan0b.x.pipedream.net";
+				// const dataupdated = await axios.post(url, history);
 				history = await history.save();
 
-				// var url="https://encrusxqoan0b.x.pipedream.net";
-				// const dataupdated = await axios.post(url, logdata);
-
+				
 				// console.log(dataupdated);
 				res.send(authtoken);
 			}else{

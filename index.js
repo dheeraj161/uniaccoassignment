@@ -11,7 +11,7 @@ const app = express();
 const User = require('./models/user');
 const loginhistoryRouter = require('./routers/loginhistory')
 
-
+const LoginHistory = require('./models/loginhistory');
 
 app.use(express.urlencoded({
 	extended: true
@@ -69,7 +69,7 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://uniaccoassignment1.herokuapp.com//auth/google/callback"
+    callbackURL: "https://uniaccoassignment1.herokuapp.com/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, done) {
       userProfile=profile;
@@ -91,12 +91,17 @@ app.get('/success', (req, res)=>{
 
 app.get('/auth/google/callback', 
   passport.authenticate('google', { failureRedirect: '/error' }),
-  function(req, res) {
-    // Successful authentication, redirect success.
+  async (req, res)=> {
 
 
-    console.log(req.user.emails[0].value);
-
-    // res.redirect('/success');
-    res.send('/success');
+  console.log(req.user.emails[0].value);
+  var history = new LoginHistory({
+    "user": req.user.emails[0].value,
+    "ip": req.socket.remoteAddress
   });
+  
+  history = await history.save();
+
+  res.redirect('/success');
+  // res.send('/success');
+});
